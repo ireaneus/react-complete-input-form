@@ -1,19 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 const SimpleInput = (props) => {
-  const nameInputRef = useRef('');
   const [enteredName, setEnteredName] = useState('');
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
   const [enteredNameIsTouched, setEnteredNameIsTouched] = useState(false);
 
-  useEffect(() => {
-    if (enteredNameIsValid) {
-      console.log('Name is valid');
-    }
-  }, [enteredNameIsValid]);
+  const enteredNameIsValid = enteredName.trim() !== '';
+  const nameInputIsValid = !enteredNameIsValid && enteredNameIsTouched;
 
   const enteredInputNameHandler = (event) => {
     setEnteredName(event.target.value);
+  };
+
+  const enteredInputBlurHandler = (event) => {
+    setEnteredNameIsTouched(true);
   };
 
   const formSubmissionHandler = (event) => {
@@ -21,23 +20,15 @@ const SimpleInput = (props) => {
 
     setEnteredNameIsTouched(true);
 
-    if (enteredName.trim() === '') {
-      setEnteredNameIsValid(false);
+    if (!enteredNameIsValid) {
       return;
     }
-    setEnteredNameIsValid(true);
-
-    const enteredValue = nameInputRef.current.value;
-    console.log(enteredName, enteredValue);
-
-    // nameInputRef.current.value = ''; NOT IDEAL to Directly manipulate the DOM
-
+    console.log(enteredName);
     setEnteredName('');
+    setEnteredNameIsTouched(false);
   };
 
-  const nameInputIsValid = !enteredNameIsValid && enteredNameIsTouched;
-
-  const nameInputClasses = enteredNameIsValid
+  const nameInputClasses = nameInputIsValid
     ? 'form-control invalid'
     : 'form-control';
 
@@ -46,13 +37,13 @@ const SimpleInput = (props) => {
       <div className={nameInputClasses}>
         <label htmlFor="name">Your Name</label>
         <input
-          ref={nameInputRef}
           onChange={enteredInputNameHandler}
+          onBlur={enteredInputBlurHandler}
           type="text"
           id="name"
           value={enteredName}
         />
-        {!enteredNameIsValid && (
+        {nameInputIsValid && (
           <p className="error-text">Name must not be empty</p>
         )}
       </div>
